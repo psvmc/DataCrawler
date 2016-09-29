@@ -67,8 +67,22 @@ public class TArticleController extends Controller {
 			}
 			articleVo.setSource(sourceStr);
 			articleVo.setTitle(titleEle.text());
-			articleVo.setContent(contentEle.html().replaceAll("(\r\n|\r|\n|\n\r)", "<br />").replaceAll("\'", "\"").substring(0,4000));
-			articleVo.setContentText(contentEle.text().replaceAll("(\r\n|\r|\n|\n\r)", "<br />").replaceAll("\'", "\"").substring(0,4000));
+			String contentEleHtml = contentEle.html().replaceAll("(\r\n|\r|\n|\n\r)", "<br />").replaceAll("\'", "\"");
+			String contentEleText = contentEle.text().replaceAll("(\r\n|\r|\n|\n\r)", "<br />").replaceAll("\'", "\"");
+			if(contentEleHtml.length()>=4000){
+				if(contentEleText.length()>=4000){
+					articleVo.setContent(contentEleText.substring(0,4000));
+					articleVo.setContentText(contentEleText.substring(0,4000));
+				}else{
+					articleVo.setContent(contentEleText);
+					articleVo.setContentText(contentEleText);
+				}
+				
+			}else{
+				articleVo.setContent(contentEleHtml);
+				articleVo.setContentText(contentEleText);
+			}
+			
 
 		} catch (Exception e) {
 			System.out.println("页面为空");
