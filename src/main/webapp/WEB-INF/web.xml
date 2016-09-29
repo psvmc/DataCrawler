@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web_1:web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:javaee="http://java.sun.com/xml/ns/javaee" xmlns:web="http://xmlns.jcp.org/xml/ns/javaee" xmlns:web_1="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+  <web_1:filter>
+    <web_1:filter-name>jfinal</web_1:filter-name>
+    <web_1:filter-class>com.jfinal.core.JFinalFilter</web_1:filter-class>
+    <web_1:init-param>
+      <javaee:param-name>configClass</javaee:param-name>
+      <javaee:param-value>com.config.MyJFinalConfig</javaee:param-value>
+    </web_1:init-param>
+  </web_1:filter>
+  <web_1:filter-mapping>
+    <web_1:filter-name>jfinal</web_1:filter-name>
+    <web_1:url-pattern>/*</web_1:url-pattern>
+  </web_1:filter-mapping>
+</web_1:web-app>
