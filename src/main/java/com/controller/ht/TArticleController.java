@@ -51,7 +51,7 @@ public class TArticleController extends Controller {
 
 			String addDateStr = articleVo.getAddDate();
 			String addDateStr2 = addDateStr.replace("-", "");
-			String filePath001 = "webpic/W" + addDateStr2.substring(0, 6)
+			String filePath001 = "webpic/W0" + addDateStr2.substring(0, 6)
 					+ "/W" + addDateStr2 + "/W";
 			Elements imageEles = contentEle.get(0).getElementsByTag("img");
 			for (Element imageEle : imageEles) {
@@ -291,8 +291,10 @@ public class TArticleController extends Controller {
 	}
 
 	public void list() {
+		getPara("ffset");
+		int offset=getParaToInt("offset");
 		fileBasePath = ZJ_FileUtils.getBaseFilePath(getRequest());
-		List<ArticleVo> arts = getArticleListAll(5500, 5500);
+		List<ArticleVo> arts = getArticleListAll(offset, offset);
 		String sqls = getSql(arts);
 		sqls += ";\ncommit;";
 		sqls = "Set define off;\n"+sqls;

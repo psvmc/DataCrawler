@@ -10,12 +10,16 @@
 	var basePath = "${basePath!}";
 </script>
 <script type="text/JavaScript">
-
+	
 </script>
 </head>
 
 <body
-	style="margin: 0px;padding: 0px;overflow: hidden;width: 100%;height: 100%">
-	<button id="getArticleData">抓取</button>
+	style="margin: 0px;padding: 10px;overflow: hidden;width: 100%;height: 100%;">
+	<form action="${basePath!}article/list" method="get">
+		<input type="text" name="offset" />
+		<button id="getArticleData" type="submit">抓取</button>
+	</form>
+	
 </body>
 </html>
