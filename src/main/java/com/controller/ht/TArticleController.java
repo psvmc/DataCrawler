@@ -33,6 +33,7 @@ import com.vo.ResultVo;
 
 public class TArticleController extends Controller {
 	String fileBasePath;
+	String cacId;
 
 	private ArticleVo getDetail(ArticleVo articleVo) {
 		Document doc;
@@ -202,14 +203,14 @@ public class TArticleController extends Controller {
 
 	private List<ArticleVo> getArticleList(int offset) {
 		System.out.println("当前抓取的offset为：" + offset);
+		System.out.println("当前抓取的cacId为：" + cacId);
 		List<ArticleVo> arts = new ArrayList<ArticleVo>();
 		Document doc;
 
 		try {
-			doc = Jsoup
-					.connect(
-							"http://www.guancheng.gov.cn/viewCmsCac.do?cacId=ff80808132a8746f0132e1329a262e0d&offset="
-									+ offset).get();
+			String weburl = "http://www.guancheng.gov.cn/viewCmsCac.do?offset="+ offset+"&cacId="+cacId;
+			System.out.println("请求的URL为："+weburl);
+			doc = Jsoup.connect(weburl).get();
 			String baseUrl = doc.baseUri();
 			Elements listOuterEle = doc.getElementsByAttributeValue("class",
 					"xin2zuo");
@@ -291,8 +292,8 @@ public class TArticleController extends Controller {
 	}
 
 	public void list() {
-		getPara("ffset");
 		int offset=getParaToInt("offset");
+		this.cacId = getPara("cacId");
 		fileBasePath = ZJ_FileUtils.getBaseFilePath(getRequest());
 		List<ArticleVo> arts = getArticleListAll(offset, offset);
 		String sqls = getSql(arts);
