@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
@@ -43,10 +44,11 @@ public class TArticleController extends Controller {
 			Elements contentEle = doc
 					.getElementsByAttributeValue("class", "co");
 
-			String sourceStr = doc.getElementsContainingText("来源").last().html();
+			String sourceStr = doc.getElementsContainingText("来源").last()
+					.html();
 			sourceStr = sourceStr.replace("来源：", "")
 					.replace("&nbsp;&nbsp;", "");
-			
+
 			String addDateStr = articleVo.getAddDate();
 			String addDateStr2 = addDateStr.replace("-", "");
 			String filePath001 = "webpic/W" + addDateStr2.substring(0, 6)
@@ -55,39 +57,94 @@ public class TArticleController extends Controller {
 			for (Element imageEle : imageEles) {
 				String imageUrl = doc.baseUri() + imageEle.attr("src");
 				String fileName = ZJ_StringUtils.getFileName(imageUrl);
-				String filePath = fileBasePath+filePath001 + fileName;
+				String filePath = fileBasePath + filePath001 + fileName;
 				downloadFile(imageUrl, filePath);
 				String src = filePath001 + fileName;
 				String oldSrc = ZJ_StringUtils.getFileName(src);
-				imageEle.attr("src", "/"+src);
-				imageEle.attr("oldsrc",oldSrc);
+				imageEle.attr("src", "/" + src);
+				imageEle.attr("oldsrc", oldSrc);
 				System.out.println(imageUrl);
 				System.out.println(filePath);
 
 			}
 			articleVo.setSource(sourceStr);
 			articleVo.setTitle(titleEle.text());
-			String contentEleHtml = contentEle.html().replaceAll("(\r\n|\r|\n|\n\r)", "<br />").replaceAll("\'", "\"");
-			String contentEleText = contentEle.text().replaceAll("(\r\n|\r|\n|\n\r)", "<br />").replaceAll("\'", "\"");
-			if(contentEleHtml.length()>=4000){
-				if(contentEleText.length()>=4000){
-					articleVo.setContent(contentEleText.substring(0,4000));
-					articleVo.setContentText(contentEleText.substring(0,4000));
-				}else{
+			String contentEleHtml = contentEle.html()
+					.replaceAll("(\r\n|\r|\n|\n\r)", "<br />")
+					.replaceAll("\'", "\"");
+			String contentEleText = contentEle.text()
+					.replaceAll("(\r\n|\r|\n|\n\r)", "<br />")
+					.replaceAll("\'", "\"");
+			if (contentEleHtml.getBytes("UTF-8").length >= 4000) {
+				if (contentEleText.getBytes("UTF-8").length >= 4000) {
+					articleVo.setContent(subStringByByte(contentEleText, 4000));
+					articleVo.setContentText(subStringByByte(contentEleText, 4000));
+				} else {
 					articleVo.setContent(contentEleText);
 					articleVo.setContentText(contentEleText);
 				}
-				
-			}else{
+
+			} else {
 				articleVo.setContent(contentEleHtml);
 				articleVo.setContentText(contentEleText);
 			}
-			
 
 		} catch (Exception e) {
 			System.out.println("页面为空");
 		}
 		return articleVo;
+	}
+
+	public String subStringByByte(String str, int bypeLength) {
+		boolean isOk = false;
+		try {
+			if (str.getBytes("UTF-8").length <= bypeLength) {
+				return str;
+			} else {
+				while (!isOk) {
+					str = removeString(str, bypeLength);
+				}
+				return str;
+			}
+		} catch (UnsupportedEncodingException e) {
+			return str;
+		}
+	}
+
+	private String removeString(String str, int bypeLength) {
+		try {
+			int strByteLength = str.getBytes("UTF-8").length;
+			if (strByteLength - bypeLength > 3000) {
+				str = str.substring(0, str.length() - 1000);
+				return str;
+			} else if (strByteLength - bypeLength > 1200) {
+				str = str.substring(0, str.length() - 400);
+				return str;
+			} else if (strByteLength - bypeLength > 600) {
+				str = str.substring(0, str.length() - 200);
+				return str;
+			} else if (strByteLength - bypeLength > 300) {
+				str = str.substring(0, str.length() - 100);
+				return str;
+			} else if (strByteLength - bypeLength > 150) {
+				str = str.substring(0, str.length() - 50);
+				return str;
+			} else if (strByteLength - bypeLength > 30) {
+				str = str.substring(0, str.length() - 10);
+				return str;
+			} else if (strByteLength - bypeLength > 15) {
+				str = str.substring(0, str.length() - 5);
+				return str;
+			} else if (strByteLength - bypeLength > 6) {
+				str = str.substring(0, str.length() - 2);
+				return str;
+			} else {
+				str = str.substring(0, str.length() - 1);
+				return str;
+			}
+		} catch (Exception e) {
+			return str;
+		}
 	}
 
 	public void downloadFile(String remoteFilePath, String localFilePath) {
@@ -96,22 +153,20 @@ public class TArticleController extends Controller {
 		BufferedInputStream bis = null;
 		BufferedOutputStream bos = null;
 		File f = new File(localFilePath);
-		if(!f.exists()){
+		if (!f.exists()) {
 			f.getParentFile().mkdirs();
 			try {
 				f.createNewFile();
-				} catch (IOException e) {
-				// TODO Auto-generated catch block
+			} catch (IOException e) {
 				e.printStackTrace();
-				}
-		}else{
+			}
+		} else {
 			f.delete();
 			try {
 				f.createNewFile();
-				} catch (IOException e) {
-				// TODO Auto-generated catch block
+			} catch (IOException e) {
 				e.printStackTrace();
-				}
+			}
 		}
 		try {
 			urlfile = new URL(remoteFilePath);
@@ -128,7 +183,7 @@ public class TArticleController extends Controller {
 			bis.close();
 			httpUrl.disconnect();
 		} catch (Exception e) {
-			System.out.println("图片不存在："+remoteFilePath);
+			System.out.println("图片不存在：" + remoteFilePath);
 		} finally {
 			try {
 
@@ -159,7 +214,7 @@ public class TArticleController extends Controller {
 			Elements listOuterEle = doc.getElementsByAttributeValue("class",
 					"xin2zuo");
 			Elements trEles = listOuterEle.get(0).getElementsByTag("tr");
-			for (int i = trEles.size()-1; i >= 0; i--) {
+			for (int i = trEles.size() - 1; i >= 0; i--) {
 				Element ele = trEles.get(i);
 				Element trEle = ele.getAllElements().get(0);
 				Elements tdEles = trEle.getElementsByTag("td");
@@ -196,35 +251,42 @@ public class TArticleController extends Controller {
 		}
 		return arts;
 	}
-	
-	private String getSql(List<ArticleVo> artList){
+
+	private String getSql(List<ArticleVo> artList) {
 		List<String> sqlList = new ArrayList<String>();
 		for (ArticleVo articleVo : artList) {
 
-			String sql =String.format(
-					"insert into WCMDOCUMENT "+
-					"(DOCID,DOCCHANNEL,DOCTYPE,DOCTITLE,DOCSECURITY,DOCSTATUS,DOCKIND,DOCCONTENT," +
-					"DOCHTMLCON,DOCEDITOR,DOCOUTUPID,DOCRELTIME,CRUSER,CRTIME,DOCWORDSCOUNT,DOCPUBHTMLCON," +
-					"ATTACHPIC,OPERTIME,OPERUSER,DOCSOURCENAME,SITEID,SRCSITEID,DOCFORM,DOCLEVEL)"+
-					" VALUES"+
-					" (%s,%s,%s,'%s',%s,%s,%s,'%s',"+
-					"'%s','%s',%s,to_date('%s','yyyy-MM-dd'),'%s',%s,%s,'%s',"+
-					"%s,%s,'%s','%s',%s,%s,%s,%s)",
-					"(select max(DOCID)+1 from WCMDOCUMENT)",100,20,articleVo.getTitle(),0,1,0,articleVo.getContentText(),
-					articleVo.getContent(),"admin",0,articleVo.getAddDate(),"admin","sysdate",articleVo.getContentText().length(),articleVo.getContent(),
-					0,"sysdate","admin",articleVo.getSource(),4,4,1,1);			
-			
-			String sql2 =String.format(
-					"insert into WCMCHNLDOC "+
-					"(CHNLID,DOCID,DOCSTATUS,CRUSER,CRTIME,DOCRELTIME,SITEID,SRCSITEID,DOCFORM,DOCLEVEL,ATTACHPIC,POSCHNLID,RECID,DOCCHANNEL,OPERUSER,OPERTIME)"+
-					" VALUES"+
-					" (%s,%s,%s,'%s',%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'%s',%s)",
-					100,"(select max(DOCID) from WCMDOCUMENT)",1,"admin","sysdate","sysdate",4,4,1,1,0,100,"(select max(RECID)+1 from WCMCHNLDOC)",100,"admin","sysdate");	
-			
+			String sql = String
+					.format("insert into WCMDOCUMENT "
+							+ "(DOCID,DOCCHANNEL,DOCTYPE,DOCTITLE,DOCSECURITY,DOCSTATUS,DOCKIND,DOCCONTENT,"
+							+ "DOCHTMLCON,DOCEDITOR,DOCOUTUPID,DOCRELTIME,CRUSER,CRTIME,DOCWORDSCOUNT,DOCPUBHTMLCON,"
+							+ "ATTACHPIC,OPERTIME,OPERUSER,DOCSOURCENAME,SITEID,SRCSITEID,DOCFORM,DOCLEVEL)"
+							+ " VALUES"
+							+ " (%s,%s,%s,'%s',%s,%s,%s,'%s',"
+							+ "'%s','%s',%s,to_date('%s','yyyy-MM-dd'),'%s',%s,%s,'%s',"
+							+ "%s,%s,'%s','%s',%s,%s,%s,%s)",
+							"(select max(DOCID)+1 from WCMDOCUMENT)", 100, 20,
+							articleVo.getTitle(), 0, 1, 0,
+							articleVo.getContentText(), articleVo.getContent(),
+							"admin", 0, articleVo.getAddDate(), "admin",
+							"sysdate", articleVo.getContentText().length(),
+							articleVo.getContent(), 0, "sysdate", "admin",
+							articleVo.getSource(), 4, 4, 1, 1);
+
+			String sql2 = String
+					.format("insert into WCMCHNLDOC "
+							+ "(CHNLID,DOCID,DOCSTATUS,CRUSER,CRTIME,DOCRELTIME,SITEID,SRCSITEID,DOCFORM,DOCLEVEL,ATTACHPIC,POSCHNLID,RECID,DOCCHANNEL,OPERUSER,OPERTIME)"
+							+ " VALUES"
+							+ " (%s,%s,%s,'%s',%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'%s',%s)",
+							100, "(select max(DOCID) from WCMDOCUMENT)", 1,
+							"admin", "sysdate", "sysdate", 4, 4, 1, 1, 0, 100,
+							"(select max(RECID)+1 from WCMCHNLDOC)", 100,
+							"admin", "sysdate");
+
 			sqlList.add(sql);
 			sqlList.add(sql2);
 		}
-		return ZJ_StringUtils.listToStr(sqlList,";\n");
+		return ZJ_StringUtils.listToStr(sqlList, ";\n");
 
 	}
 
@@ -232,7 +294,7 @@ public class TArticleController extends Controller {
 		fileBasePath = ZJ_FileUtils.getBaseFilePath(getRequest());
 		List<ArticleVo> arts = getArticleListAll(5500, 5500);
 		String sqls = getSql(arts);
-		sqls+=";commit;";
+		sqls += ";commit;";
 		renderText(sqls);
 	}
 
