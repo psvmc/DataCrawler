@@ -5,14 +5,10 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.jsoup.Jsoup;
@@ -21,15 +17,9 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import com.jfinal.core.Controller;
-import com.jfinal.plugin.activerecord.Record;
-import com.jfinal.render.JsonRender;
-import com.jfinalExt.ZJ_Db;
-import com.model.TArticle;
-import com.utils.ZJ_DateUtils;
 import com.utils.ZJ_FileUtils;
 import com.utils.ZJ_StringUtils;
 import com.vo.ArticleVo;
-import com.vo.ResultVo;
 
 public class TArticleController extends Controller {
 	String fileBasePath;
@@ -39,6 +29,7 @@ public class TArticleController extends Controller {
 		Document doc;
 
 		try {
+			System.out.println("抓取的详情页URL:"+articleVo.getUrl());
 			doc = Jsoup.connect(articleVo.getUrl()).get();
 			Elements titleEle = doc.getElementsByAttributeValue("class",
 					"title7");
@@ -104,6 +95,9 @@ public class TArticleController extends Controller {
 			} else {
 				while (!isOk) {
 					str = removeString(str, bypeLength);
+					if(str.getBytes("UTF-8").length<=4000){
+						isOk = true;
+					}
 				}
 				return str;
 			}
@@ -113,37 +107,44 @@ public class TArticleController extends Controller {
 	}
 
 	private String removeString(String str, int bypeLength) {
+		if(null == str){
+			return str;
+		}
 		try {
 			int strByteLength = str.getBytes("UTF-8").length;
-			if (strByteLength - bypeLength > 3000) {
+			if (strByteLength - bypeLength >= 3000) {
 				str = str.substring(0, str.length() - 1000);
 				return str;
-			} else if (strByteLength - bypeLength > 1200) {
+			} else if (strByteLength - bypeLength >= 1200) {
 				str = str.substring(0, str.length() - 400);
 				return str;
-			} else if (strByteLength - bypeLength > 600) {
+			} else if (strByteLength - bypeLength >= 600) {
 				str = str.substring(0, str.length() - 200);
 				return str;
-			} else if (strByteLength - bypeLength > 300) {
+			} else if (strByteLength - bypeLength >= 300) {
 				str = str.substring(0, str.length() - 100);
 				return str;
-			} else if (strByteLength - bypeLength > 150) {
+			} else if (strByteLength - bypeLength >= 150) {
 				str = str.substring(0, str.length() - 50);
 				return str;
-			} else if (strByteLength - bypeLength > 30) {
+			} else if (strByteLength - bypeLength >= 30) {
 				str = str.substring(0, str.length() - 10);
 				return str;
-			} else if (strByteLength - bypeLength > 15) {
+			} else if (strByteLength - bypeLength >= 15) {
 				str = str.substring(0, str.length() - 5);
 				return str;
-			} else if (strByteLength - bypeLength > 6) {
+			} else if (strByteLength - bypeLength >= 6) {
 				str = str.substring(0, str.length() - 2);
 				return str;
-			} else {
+			} else if(strByteLength - bypeLength >= 3){
+				str = str.substring(0, str.length() - 1);
+				return str;
+			}else{
 				str = str.substring(0, str.length() - 1);
 				return str;
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			return str;
 		}
 	}
@@ -244,15 +245,6 @@ public class TArticleController extends Controller {
 		return arts;
 	}
 
-	private List<ArticleVo> getArticleListAll(int beginOffset, int endOffset) {
-		List<ArticleVo> arts = new ArrayList<ArticleVo>();
-		for (int i = beginOffset; i <= endOffset; i += 20) {
-			List<ArticleVo> artsTemp = getArticleList(i);
-			arts.addAll(artsTemp);
-		}
-		return arts;
-	}
-
 	private String getSql(List<ArticleVo> artList) {
 		List<String> sqlList = new ArrayList<String>();
 		for (ArticleVo articleVo : artList) {
@@ -295,7 +287,7 @@ public class TArticleController extends Controller {
 		int offset=getParaToInt("offset");
 		this.cacId = getPara("cacId");
 		fileBasePath = ZJ_FileUtils.getBaseFilePath(getRequest());
-		List<ArticleVo> arts = getArticleListAll(offset, offset);
+		List<ArticleVo> arts = getArticleList(offset);
 		String sqls = getSql(arts);
 		sqls += ";\ncommit;";
 		sqls = "Set define off;\n"+sqls;
