@@ -295,7 +295,7 @@ public class TArticleController extends Controller {
 		List<ArticleVo> arts = getArticleListAll(5500, 5500);
 		String sqls = getSql(arts);
 		sqls += ";\ncommit;";
-		sqls += "Set define off;\n"+sqls;
+		sqls = "Set define off;\n"+sqls;
 		renderText(sqls);
 	}
 
