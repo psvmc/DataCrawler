@@ -244,6 +244,15 @@ public class TArticleController extends Controller {
 		}
 		return arts;
 	}
+	
+	private List<ArticleVo> getArticleList(int beginOffset,int endOffset){
+		List<ArticleVo> arts = new ArrayList<ArticleVo>();
+		for (int i = beginOffset; i >= endOffset; i-=20) {
+			List<ArticleVo> tempArts = getArticleList(i);
+			arts.addAll(tempArts);
+		}
+		return arts;
+	}
 
 	private String getSql(List<ArticleVo> artList) {
 		List<String> sqlList = new ArrayList<String>();
@@ -283,6 +292,7 @@ public class TArticleController extends Controller {
 
 	}
 
+	//单页所有数据
 	public void list() {
 		int offset=getParaToInt("offset");
 		this.cacId = getPara("cacId");
@@ -292,6 +302,24 @@ public class TArticleController extends Controller {
 		sqls += ";\ncommit;";
 		sqls = "Set define off;\n"+sqls;
 		renderText(sqls);
+	}
+	
+	//范围所有数据
+	public void listRange() {
+		int beginOffset=getParaToInt("beginOffset");
+		int endOffset=getParaToInt("endOffset");
+		if(beginOffset<endOffset){
+			renderText("beginOffset要大于endOffset");
+		}else{
+			this.cacId = getPara("cacId");
+			fileBasePath = ZJ_FileUtils.getBaseFilePath(getRequest());
+			List<ArticleVo> arts = getArticleList(beginOffset,endOffset);
+			String sqls = getSql(arts);
+			sqls += ";\ncommit;";
+			sqls = "Set define off;\n"+sqls;
+			renderText(sqls);
+		}
+		
 	}
 
 }

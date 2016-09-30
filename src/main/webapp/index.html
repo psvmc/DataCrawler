@@ -13,16 +13,40 @@
 
 <body
 	style="margin: 0px;padding: 10px;overflow: hidden;width: 100%;height: 100%;">
-	<form action="${basePath!}article/list" method="get">
+	<form action="${basePath!}article/list" method="get" target="_blank">
 		<table>
 			<tr>
 				<td>offset:</td>
-				<td><input type="text" name="offset" />
+				<td><input type="text" name="offset" value="5500"/>
 				</td>
 			</tr>
 			<tr>
 				<td>cacId:</td>
-				<td><input type="text" name="cacId" />
+				<td><input type="text" name="cacId" value="ff80808132a8746f0132e1329a262e0d"/>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2"><button id="getArticleData" type="submit">抓取</button>
+				</td>
+			</tr>
+		</table>
+	</form>
+	<br />
+		<form action="${basePath!}article/listRange" method="get" target="_blank">
+		<table>
+			<tr>
+				<td>beginOffset:</td>
+				<td><input type="text" name="beginOffset" value="4580"/>
+				</td>
+			</tr>
+			<tr>
+				<td>endOffset:</td>
+				<td><input type="text" name="endOffset" value="4500"/>
+				</td>
+			</tr>
+			<tr>
+				<td>cacId:</td>
+				<td><input type="text" name="cacId" value="ff80808132a8746f0132e1329a262e0d"/>
 				</td>
 			</tr>
 			<tr>
