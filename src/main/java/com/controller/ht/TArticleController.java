@@ -238,7 +238,7 @@ public class TArticleController extends Controller {
 			}
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("网址无法访问");
 		}
 		return arts;
 	}
@@ -294,7 +294,8 @@ public class TArticleController extends Controller {
 		fileBasePath = ZJ_FileUtils.getBaseFilePath(getRequest());
 		List<ArticleVo> arts = getArticleListAll(5500, 5500);
 		String sqls = getSql(arts);
-		sqls += ";commit;";
+		sqls += ";\ncommit;";
+		sqls += "Set define off;\n"+sqls;
 		renderText(sqls);
 	}
 
