@@ -4,25 +4,23 @@
 <title>登录</title>
 <meta name="renderer" content="webkit">
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-<script type="text/javascript"
-	src="http://apps.bdimg.com/libs/jquery/1.8.0/jquery.min.js"></script>
+<script type="text/javascript" src="http://apps.bdimg.com/libs/jquery/1.8.0/jquery.min.js"></script>
 <script type="text/javascript">
 	var basePath = "${basePath!}";
 </script>
 </head>
 
-<body
-	style="margin: 0px;padding: 10px;overflow: hidden;width: 100%;height: 100%;">
+<body style="margin: 0px;padding: 10px;overflow: hidden;width: 100%;height: 100%;">
 	<form action="${basePath!}article/list" method="get" target="_blank">
 		<table>
 			<tr>
 				<td>offset:</td>
-				<td><input type="text" name="offset" value="5000"/>
+				<td><input type="text" name="offset" value="5000" />
 				</td>
 			</tr>
 			<tr>
 				<td>cacId:</td>
-				<td><input type="text" name="cacId" value="ff80808132a8746f0132e1329a072e0c"/>
+				<td><input type="text" name="cacId" value="ff80808132a8746f0132e1329a072e0c" />
 				</td>
 			</tr>
 			<tr>
@@ -32,21 +30,21 @@
 		</table>
 	</form>
 	<br />
-		<form action="${basePath!}article/listRange" method="get" target="_blank">
+	<form action="${basePath!}article/listRange" method="get" target="_blank">
 		<table>
 			<tr>
 				<td>beginOffset:</td>
-				<td><input type="text" name="beginOffset" value="4800"/>
+				<td><input type="text" name="beginOffset" value="4800" />
 				</td>
 			</tr>
 			<tr>
 				<td>endOffset:</td>
-				<td><input type="text" name="endOffset" value="4980"/>
+				<td><input type="text" name="endOffset" value="4980" />
 				</td>
 			</tr>
 			<tr>
 				<td>cacId:</td>
-				<td><input type="text" name="cacId" value="ff80808132a8746f0132e1329a072e0c"/>
+				<td><input type="text" name="cacId" value="ff80808132a8746f0132e1329a072e0c" />
 				</td>
 			</tr>
 			<tr>
@@ -56,5 +54,50 @@
 		</table>
 	</form>
 
+	<br />
+	<form action="${basePath!}article/listRange2" method="get" target="_blank">
+		<table>
+			<tr>
+				<td>起始页:</td>
+				<td><input type="text" name="beginPage" value="1" id="beginPage" /><span style="font-size: 12px;"><span> beginOffset:</span><span id="beginOffset"></span>
+				</span>
+				</td>
+			</tr>
+			<tr>
+				<td>结束页:</td>
+				<td><input type="text" name="endPage" value="10" id="endPage" /><span style="font-size: 12px;"><span> endOffset:</span><span id="endOffset"></span>
+				</span>
+				</td>
+			</tr>
+			<tr>
+				<td>cacId:</td>
+				<td><input type="text" name="cacId" value="ff80808132a8746f0132e1329a072e0c" />
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2"><button id="getArticleData" type="submit">抓取</button>
+				</td>
+			</tr>
+		</table>
+	</form>
+	<script type="text/javascript">
+		$(function() {
+			$("#beginOffset").html(" "+($("#beginPage").val() - 1) * 20 +" ");
+			$("#beginPage").change(function() {
+				$("#beginOffset").html(" "+($("#beginPage").val() - 1) * 20 +" ");
+			});
+			$("#beginPage").keyup(function() {
+				$("#beginOffset").html(" "+($("#beginPage").val() - 1) * 20 +" ");
+			});
+
+			$("#endOffset").html(" "+($("#endPage").val() - 1) * 20 +" ");
+			$("#endPage").change(function() {
+				$("#endOffset").html(" "+($("#endPage").val() - 1) * 20 +" ");
+			});
+			$("#endPage").keyup(function() {
+				$("#endOffset").html(" "+($("#endPage").val() - 1) * 20 +" ");
+			});
+		});
+	</script>
 </body>
 </html>
