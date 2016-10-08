@@ -22,6 +22,7 @@ import com.utils.ZJ_StringUtils;
 import com.vo.ArticleVo;
 
 public class TArticleController extends Controller {
+	String baseUrl = "http://www.guancheng.gov.cn/viewCmsCac.do";
 	String fileBasePath;
 	String cacId;
 
@@ -29,7 +30,7 @@ public class TArticleController extends Controller {
 		Document doc;
 
 		try {
-			System.out.println("抓取的详情页URL:"+articleVo.getUrl());
+			System.out.println("抓取的详情页URL:" + articleVo.getUrl());
 			doc = Jsoup.connect(articleVo.getUrl()).get();
 			Elements titleEle = doc.getElementsByAttributeValue("class",
 					"title7");
@@ -70,7 +71,8 @@ public class TArticleController extends Controller {
 			if (contentEleHtml.getBytes("UTF-8").length >= 4000) {
 				if (contentEleText.getBytes("UTF-8").length >= 4000) {
 					articleVo.setContent(subStringByByte(contentEleText, 4000));
-					articleVo.setContentText(subStringByByte(contentEleText, 4000));
+					articleVo.setContentText(subStringByByte(contentEleText,
+							4000));
 				} else {
 					articleVo.setContent(contentEleText);
 					articleVo.setContentText(contentEleText);
@@ -95,7 +97,7 @@ public class TArticleController extends Controller {
 			} else {
 				while (!isOk) {
 					str = removeString(str, bypeLength);
-					if(str.getBytes("UTF-8").length<=4000){
+					if (str.getBytes("UTF-8").length <= 4000) {
 						isOk = true;
 					}
 				}
@@ -107,7 +109,7 @@ public class TArticleController extends Controller {
 	}
 
 	private String removeString(String str, int bypeLength) {
-		if(null == str){
+		if (null == str) {
 			return str;
 		}
 		try {
@@ -136,10 +138,10 @@ public class TArticleController extends Controller {
 			} else if (strByteLength - bypeLength >= 6) {
 				str = str.substring(0, str.length() - 2);
 				return str;
-			} else if(strByteLength - bypeLength >= 3){
+			} else if (strByteLength - bypeLength >= 3) {
 				str = str.substring(0, str.length() - 1);
 				return str;
-			}else{
+			} else {
 				str = str.substring(0, str.length() - 1);
 				return str;
 			}
@@ -209,8 +211,8 @@ public class TArticleController extends Controller {
 		Document doc;
 
 		try {
-			String weburl = "http://www.guancheng.gov.cn/viewCmsCac.do?offset="+ offset+"&cacId="+cacId;
-			System.out.println("请求的URL为："+weburl);
+			String weburl = baseUrl + "?offset=" + offset + "&cacId=" + cacId;
+			System.out.println("请求的URL为：" + weburl);
 			doc = Jsoup.connect(weburl).get();
 			String baseUrl = doc.baseUri();
 			Elements listOuterEle = doc.getElementsByAttributeValue("class",
@@ -244,10 +246,10 @@ public class TArticleController extends Controller {
 		}
 		return arts;
 	}
-	
-	private List<ArticleVo> getArticleList(int beginOffset,int endOffset){
+
+	private List<ArticleVo> getArticleList(int beginOffset, int endOffset) {
 		List<ArticleVo> arts = new ArrayList<ArticleVo>();
-		for (int i = beginOffset; i >= endOffset; i-=20) {
+		for (int i = beginOffset; i >= endOffset; i -= 20) {
 			List<ArticleVo> tempArts = getArticleList(i);
 			arts.addAll(tempArts);
 		}
@@ -267,7 +269,7 @@ public class TArticleController extends Controller {
 							+ " (%s,%s,%s,'%s',%s,%s,%s,'%s',"
 							+ "'%s','%s',%s,to_date('%s','yyyy-MM-dd'),'%s',%s,%s,'%s',"
 							+ "%s,%s,'%s','%s',%s,%s,%s,%s)",
-							"(select max(DOCID)+1 from WCMDOCUMENT)", 100, 20,
+							"(select max(DOCID)+1 from WCMDOCUMENT)", 101, 20,
 							articleVo.getTitle(), 0, 1, 0,
 							articleVo.getContentText(), articleVo.getContent(),
 							"admin", 0, articleVo.getAddDate(), "admin",
@@ -280,9 +282,9 @@ public class TArticleController extends Controller {
 							+ "(CHNLID,DOCID,DOCSTATUS,CRUSER,CRTIME,DOCRELTIME,SITEID,SRCSITEID,DOCFORM,DOCLEVEL,ATTACHPIC,POSCHNLID,RECID,DOCCHANNEL,OPERUSER,OPERTIME)"
 							+ " VALUES"
 							+ " (%s,%s,%s,'%s',%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'%s',%s)",
-							100, "(select max(DOCID) from WCMDOCUMENT)", 1,
-							"admin", "sysdate", "sysdate", 4, 4, 1, 1, 0, 100,
-							"(select max(RECID)+1 from WCMCHNLDOC)", 100,
+							101, "(select max(DOCID) from WCMDOCUMENT)", 1,
+							"admin", "sysdate", "sysdate", 4, 4, 1, 1, 0, 101,
+							"(select max(RECID)+1 from WCMCHNLDOC)", 101,
 							"admin", "sysdate");
 
 			sqlList.add(sql);
@@ -292,34 +294,35 @@ public class TArticleController extends Controller {
 
 	}
 
-	//单页所有数据
+	// 单页所有数据
 	public void list() {
-		int offset=getParaToInt("offset");
+		int offset = getParaToInt("offset");
 		this.cacId = getPara("cacId");
 		fileBasePath = ZJ_FileUtils.getBaseFilePath(getRequest());
 		List<ArticleVo> arts = getArticleList(offset);
 		String sqls = getSql(arts);
 		sqls += ";\ncommit;";
-		sqls = "Set define off;\n"+sqls;
+		sqls = "Set define off;\n" + sqls;
 		renderText(sqls);
 	}
-	
-	//范围所有数据
+
+	// 范围所有数据
 	public void listRange() {
-		int beginOffset=getParaToInt("beginOffset");
-		int endOffset=getParaToInt("endOffset");
-		if(beginOffset<endOffset){
-			renderText("beginOffset要大于endOffset");
-		}else{
-			this.cacId = getPara("cacId");
-			fileBasePath = ZJ_FileUtils.getBaseFilePath(getRequest());
-			List<ArticleVo> arts = getArticleList(beginOffset,endOffset);
-			String sqls = getSql(arts);
-			sqls += ";\ncommit;";
-			sqls = "Set define off;\n"+sqls;
-			renderText(sqls);
+		int beginOffset = getParaToInt("beginOffset");
+		int endOffset = getParaToInt("endOffset");
+		if (endOffset > beginOffset) {
+			int tempOffset = beginOffset;
+			beginOffset = endOffset;
+			endOffset = tempOffset;
 		}
-		
+		this.cacId = getPara("cacId");
+		fileBasePath = ZJ_FileUtils.getBaseFilePath(getRequest());
+		List<ArticleVo> arts = getArticleList(beginOffset, endOffset);
+		String sqls = getSql(arts);
+		sqls += ";\ncommit;";
+		sqls = "Set define off;\n" + sqls;
+		renderText(sqls);
+
 	}
 
 }

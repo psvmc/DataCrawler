@@ -45,42 +45,42 @@ public class MyJFinalConfig extends JFinalConfig {
 	 * 配置插件
 	 */
 	public void configPlugin(Plugins me) {
-		// 连接池插件
-		ZJ_PropertyConfig config = ZJ_PropertyConfig.me();
-		String jdbcUrl = config.getProperty("jdbcUrl");
-		String user = config.getProperty("user");
-		String password = config.getProperty("password");
-		
-		DruidPlugin druid = null;
-		if(isUseOracle){
-			 jdbcUrl = config.getProperty("oracleUrl");
-			 user = config.getProperty("oracleUser");
-			 password = config.getProperty("oraclePwd");
-			 druid = new DruidPlugin(jdbcUrl, user, password);
-			 druid.setDriverClass("oracle.jdbc.driver.OracleDriver");
-			 me.add(druid);
-		}else{
-			druid = new DruidPlugin(jdbcUrl, user, password);
-			me.add(druid);
-		}
-		
-		// 表绑定插件
-		ActiveRecordPlugin arp = new ActiveRecordPlugin(druid);
-		//开发者模式时显示sql语句
-		arp.setShowSql(devMode);
-		if(isUseOracle){
-			// 配置Oracle方言
-			arp.setDialect(new OracleDialect());
-		}else{
-			arp.setDialect(new MysqlDialect());
-		}
-
-		// 配置属性名(字段名)大小写不敏感容器工厂
-		arp.setContainerFactory(new CaseInsensitiveContainerFactory());
-		arp.addMapping("t_article", TArticle.class);
-
-		// 视图映射
-		me.add(arp);
+//		// 连接池插件
+//		ZJ_PropertyConfig config = ZJ_PropertyConfig.me();
+//		String jdbcUrl = config.getProperty("jdbcUrl");
+//		String user = config.getProperty("user");
+//		String password = config.getProperty("password");
+//		
+//		DruidPlugin druid = null;
+//		if(isUseOracle){
+//			 jdbcUrl = config.getProperty("oracleUrl");
+//			 user = config.getProperty("oracleUser");
+//			 password = config.getProperty("oraclePwd");
+//			 druid = new DruidPlugin(jdbcUrl, user, password);
+//			 druid.setDriverClass("oracle.jdbc.driver.OracleDriver");
+//			 me.add(druid);
+//		}else{
+//			druid = new DruidPlugin(jdbcUrl, user, password);
+//			me.add(druid);
+//		}
+//		
+//		// 表绑定插件
+//		ActiveRecordPlugin arp = new ActiveRecordPlugin(druid);
+//		//开发者模式时显示sql语句
+//		arp.setShowSql(devMode);
+//		if(isUseOracle){
+//			// 配置Oracle方言
+//			arp.setDialect(new OracleDialect());
+//		}else{
+//			arp.setDialect(new MysqlDialect());
+//		}
+//
+//		// 配置属性名(字段名)大小写不敏感容器工厂
+//		arp.setContainerFactory(new CaseInsensitiveContainerFactory());
+//		arp.addMapping("t_article", TArticle.class);
+//
+//		// 视图映射
+//		me.add(arp);
 
 	}
 
